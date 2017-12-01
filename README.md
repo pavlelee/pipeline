@@ -43,13 +43,14 @@ pip := pipeline.New().Buffer(10).Listen(ch).
     return val, nil
   }).
   Run()
-```
-Add your jobs to channel
-```
+  
+//Add your jobs to channel
 for i := 0; i < 10; i++ {
   ch <- i
 }
 pip.End()
+
+pip.Wait()
 ```
 if your pipeline use once, you can call ```pip.End()```
 if you want wait pipeline done, you can call ```pip.Wait```
