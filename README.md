@@ -52,8 +52,10 @@ for i := 0; i < 10; i++ {
 }
 pip.End()
 
+//wait all done
 pip.Wait()
 
+//get results form op(channel)
 go func() {
   for num := range op {
     //如果收到结束任务，那就可以break了
