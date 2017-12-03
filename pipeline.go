@@ -5,34 +5,45 @@ import (
 	"sync"
 )
 
-// Pipeline
+// Pipeline pipeline
 type Pipeline struct {
 	entry      chan interface{}
 	workspaces []Workspace
 	buffer     int
 	connect    []chan interface{}
 	wg         sync.WaitGroup
+	output     chan interface{}
 }
 
-// Workspace
+// Workspace workspace
 type Workspace struct {
 	worker int
 	handle func(interface{}) (interface{}, error)
 }
 
-// EndJob
+// EndJob end job
 type EndJob struct{}
 
 // New new a Pipeline
 func New() *Pipeline {
 	p := &Pipeline{}
 	p.buffer = 0
+	p.output = nil
 	return p
 }
 
 // Listen listen an channel
 func (p *Pipeline) Listen(ch chan interface{}) *Pipeline {
 	p.entry = ch
+	return p
+}
+
+// Output output an channel
+func (p *Pipeline) Output(ch chan interface{}) *Pipeline {
+	if cap(ch) <= cap(p.entry) {
+		log.Panic("Output channel must big than entry")
+	}
+	p.output = ch
 	return p
 }
 
@@ -74,7 +85,7 @@ func (p *Pipeline) Run() *Pipeline {
 	for i := 0; i < l-1; i++ {
 		p.connect = append(p.connect, make(chan interface{}, p.buffer))
 	}
-	p.connect = append(p.connect, nil)
+	p.connect = append(p.connect, p.output)
 
 	for i := 0; i < l; i++ {
 		workshop := p.workspaces[i]
@@ -83,7 +94,6 @@ func (p *Pipeline) Run() *Pipeline {
 
 		p.work(entry, workshop.worker, workshop.handle, next)
 	}
-
 	return p
 }
 
