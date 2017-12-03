@@ -11,7 +11,7 @@ op := make(chan interface{}, 11)
 
 //defind a task flow
 pip := pipeline.New().Buffer(10).Listen(ch).Output(op).
-  Process(3, func(num interface{}) (interface{}, error) {
+  Process(7, func(num interface{}) (interface{}, error) {
     val, ok := num.(int)
     if !ok {
       return nil, fmt.Errorf("xxxx")
@@ -22,7 +22,7 @@ pip := pipeline.New().Buffer(10).Listen(ch).Output(op).
 
     return val, nil
   }).
-  Process(10, func(num interface{}) (interface{}, error) {
+  Process(5, func(num interface{}) (interface{}, error) {
     val, ok := num.(int)
     if !ok {
       return nil, fmt.Errorf("xxxx")
@@ -33,7 +33,7 @@ pip := pipeline.New().Buffer(10).Listen(ch).Output(op).
 
     return val, nil
   }).
-  Process(10, func(num interface{}) (interface{}, error) {
+  Process(3, func(num interface{}) (interface{}, error) {
     val, ok := num.(int)
     if !ok {
       return nil, fmt.Errorf("xxxx")
@@ -47,7 +47,7 @@ pip := pipeline.New().Buffer(10).Listen(ch).Output(op).
   Run()
   
 //Add your jobs to channel
-for i := 0; i < 10; i++ {
+for i := 0; i < 100; i++ {
   ch <- i
 }
 pip.End()
