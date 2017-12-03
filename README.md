@@ -6,7 +6,7 @@ processing a task flow
 
 ```
 ch := make(chan interface{}, 10)
-//ouput must big than entry
+//ouput must big than entry, becouse pipeline will send EndJob when task over.
 op := make(chan interface{}, 11)
 
 //defind a task flow
