@@ -53,8 +53,8 @@ func (p *Pipeline) Buffer(val int) *Pipeline {
 	return p
 }
 
-// End job send over
-func (p *Pipeline) End() *Pipeline {
+// JobSendEnd job send over
+func (p *Pipeline) JobSendEnd() *Pipeline {
 	p.entry <- EndJob{}
 	return p
 }

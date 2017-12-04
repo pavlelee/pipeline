@@ -48,11 +48,11 @@ pip := pipeline.New().Buffer(10).Listen(ch).
 for i := 0; i < 10; i++ {
   ch <- i
 }
-pip.End()
+pip.JobSendEnd()
 
 pip.Wait()
 ```
-if your pipeline use once, you can call ```pip.End()```
+if your pipeline use once, you can call ```pip.JobSendEnd()```
 if you want wait pipeline done, you can call ```pip.Wait```
 
 ### API
@@ -62,7 +62,7 @@ Listen an channel
 2. ```func (*Pipeline) Buffer(val int) *Pipeline```
 How much to send job at the same time
 
-3. ```func (*Pipeline) End() *Pipeline```
+3. ```func (*Pipeline) JobSendEnd() *Pipeline```
 Job send over
 
 4. ```func (*Pipeline) Wait() *Pipeline```

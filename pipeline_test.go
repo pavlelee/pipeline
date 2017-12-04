@@ -50,7 +50,7 @@ func BenchmarkPipeline_Run(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 }
 
 func BenchmarkPipeline_Wait(b *testing.B) {
@@ -97,7 +97,7 @@ func BenchmarkPipeline_Wait(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 
 	pip.Wait()
 }
@@ -147,7 +147,7 @@ func BenchmarkPipeline_Output(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 
 	pip.Wait()
 
@@ -212,7 +212,7 @@ func BenchmarkPipeline_OutputSmallThanEntry(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 }
 
 func BenchmarkPipeline_NotListen(b *testing.B) {
@@ -228,7 +228,7 @@ func BenchmarkPipeline_NotListen(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 }
 
 func BenchmarkPipeline_NotProcess(b *testing.B) {
@@ -244,7 +244,7 @@ func BenchmarkPipeline_NotProcess(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 }
 
 func BenchmarkPipeline_Buffer(b *testing.B) {
@@ -291,7 +291,7 @@ func BenchmarkPipeline_Buffer(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 }
 
 func BenchmarkPipeline_Process(b *testing.B) {
@@ -338,7 +338,7 @@ func BenchmarkPipeline_Process(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 }
 
 func BenchmarkPipeline_ProcessError(b *testing.B) {
@@ -361,5 +361,5 @@ func BenchmarkPipeline_ProcessError(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
-	pip.End()
+	pip.JobSendEnd()
 }
