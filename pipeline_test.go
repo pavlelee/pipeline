@@ -171,7 +171,9 @@ func BenchmarkPipeline_Output(b *testing.B) {
 
 func BenchmarkPipeline_OutputSmallThanEntry(b *testing.B) {
 	defer func() {
-		recover()
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
 	}()
 
 	ch := make(chan interface{}, 100)
@@ -224,10 +226,14 @@ func BenchmarkPipeline_OutputSmallThanEntry(b *testing.B) {
 }
 
 func BenchmarkPipeline_NotListen(b *testing.B) {
-	ch := make(chan interface{}, 100)
+
 	defer func() {
-		recover()
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
 	}()
+
+	ch := make(chan interface{}, 100)
 
 	//定义一个流水线
 	pip := New().SetLogger(NewLogger()).Run()
@@ -244,7 +250,9 @@ func BenchmarkPipeline_NotListen(b *testing.B) {
 func BenchmarkPipeline_NotProcess(b *testing.B) {
 	ch := make(chan interface{}, 100)
 	defer func() {
-		recover()
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
 	}()
 
 	//定义一个流水线

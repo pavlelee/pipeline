@@ -43,9 +43,6 @@ func (p *Pipeline) Listen(ch chan interface{}) *Pipeline {
 
 // Output output an channel
 func (p *Pipeline) Output(ch chan interface{}) *Pipeline {
-	if cap(ch) <= cap(p.entry) {
-		p.logger.Panic("Output channel must big than entry")
-	}
 	p.output = ch
 	return p
 }
@@ -83,6 +80,10 @@ func (p *Pipeline) Process(worker int, handle func(interface{}) (interface{}, er
 func (p *Pipeline) Run() *Pipeline {
 	if p.entry == nil {
 		p.logger.Panic("Missing entry")
+	}
+
+	if p.output != nil && cap(p.output) <= cap(p.entry) {
+		p.logger.Panic("Output channel must big than entry")
 	}
 
 	l := len(p.workspaces)
