@@ -3,8 +3,14 @@ package pipeline
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"testing"
 )
+
+func NewLogger() *log.Logger {
+	return log.New(ioutil.Discard, "", log.LstdFlags)
+}
 
 func BenchmarkPipeline_Run(b *testing.B) {
 	ch := make(chan interface{}, 100)
@@ -172,7 +178,7 @@ func BenchmarkPipeline_OutputSmallThanEntry(b *testing.B) {
 	op := make(chan interface{}, 100)
 
 	//定义一个流水线
-	pip := New().Listen(ch).Output(op).
+	pip := New().SetLogger(NewLogger()).Listen(ch).Output(op).
 		Process(10, func(num interface{}) (interface{}, error) {
 			val, ok := num.(int)
 			if !ok {
@@ -213,6 +219,8 @@ func BenchmarkPipeline_OutputSmallThanEntry(b *testing.B) {
 		ch <- i
 	}
 	pip.JobSendEnd()
+
+	pip.Wait()
 }
 
 func BenchmarkPipeline_NotListen(b *testing.B) {
@@ -222,13 +230,15 @@ func BenchmarkPipeline_NotListen(b *testing.B) {
 	}()
 
 	//定义一个流水线
-	pip := New().Run()
+	pip := New().SetLogger(NewLogger()).Run()
 
 	//给流水线增加作业
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
 	pip.JobSendEnd()
+
+	pip.Wait()
 }
 
 func BenchmarkPipeline_NotProcess(b *testing.B) {
@@ -238,13 +248,15 @@ func BenchmarkPipeline_NotProcess(b *testing.B) {
 	}()
 
 	//定义一个流水线
-	pip := New().Listen(ch).Run()
+	pip := New().SetLogger(NewLogger()).Listen(ch).Run()
 
 	//给流水线增加作业
 	for i := 0; i < 100; i++ {
 		ch <- i
 	}
 	pip.JobSendEnd()
+
+	pip.Wait()
 }
 
 func BenchmarkPipeline_Buffer(b *testing.B) {
@@ -292,6 +304,8 @@ func BenchmarkPipeline_Buffer(b *testing.B) {
 		ch <- i
 	}
 	pip.JobSendEnd()
+
+	pip.Wait()
 }
 
 func BenchmarkPipeline_Process(b *testing.B) {
@@ -339,14 +353,16 @@ func BenchmarkPipeline_Process(b *testing.B) {
 		ch <- i
 	}
 	pip.JobSendEnd()
+
+	pip.Wait()
 }
 
 func BenchmarkPipeline_ProcessError(b *testing.B) {
 	ch := make(chan interface{}, 100)
 
 	//定义一个流水线
-	pip := New().Listen(ch).
-		Process(10, func(num interface{}) (interface{}, error) {
+	pip := New().SetLogger(NewLogger()).Listen(ch).
+		Process(2, func(num interface{}) (interface{}, error) {
 			return nil, errors.New("error testing")
 		}).
 		Process(5, func(num interface{}) (interface{}, error) {
@@ -362,4 +378,6 @@ func BenchmarkPipeline_ProcessError(b *testing.B) {
 		ch <- i
 	}
 	pip.JobSendEnd()
+
+	pip.Wait()
 }

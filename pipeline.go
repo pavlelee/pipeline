@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"log"
+	"os"
 	"sync"
 )
 
@@ -13,6 +14,7 @@ type Pipeline struct {
 	connect    []chan interface{}
 	wg         sync.WaitGroup
 	output     chan interface{}
+	logger     *log.Logger
 }
 
 // Workspace workspace
@@ -29,6 +31,7 @@ func New() *Pipeline {
 	p := &Pipeline{}
 	p.buffer = 0
 	p.output = nil
+	p.logger = log.New(os.Stderr, "", log.LstdFlags)
 	return p
 }
 
@@ -41,7 +44,7 @@ func (p *Pipeline) Listen(ch chan interface{}) *Pipeline {
 // Output output an channel
 func (p *Pipeline) Output(ch chan interface{}) *Pipeline {
 	if cap(ch) <= cap(p.entry) {
-		log.Panic("Output channel must big than entry")
+		p.logger.Panic("Output channel must big than entry")
 	}
 	p.output = ch
 	return p
@@ -59,6 +62,12 @@ func (p *Pipeline) JobSendEnd() *Pipeline {
 	return p
 }
 
+// SetLogger set logger
+func (p *Pipeline) SetLogger(logger *log.Logger) *Pipeline {
+	p.logger = logger
+	return p
+}
+
 // Wait wait all job is done
 func (p *Pipeline) Wait() {
 	p.wg.Wait()
@@ -73,12 +82,12 @@ func (p *Pipeline) Process(worker int, handle func(interface{}) (interface{}, er
 // Run run this pipeline
 func (p *Pipeline) Run() *Pipeline {
 	if p.entry == nil {
-		log.Panic("Missing entry")
+		p.logger.Panic("Missing entry")
 	}
 
 	l := len(p.workspaces)
 	if l == 0 {
-		log.Panic("Workspace at least one")
+		p.logger.Panic("Workspace at least one")
 	}
 
 	p.connect = append(p.connect, p.entry)
@@ -115,16 +124,18 @@ func (p *Pipeline) work(entry chan interface{}, worker int, handle func(interfac
 			workers <- 1
 			wg.Add(1)
 			go func(num interface{}) {
+				defer func() {
+					wg.Done()
+					<-workers
+				}()
+
 				ret, err := handle(num)
 				if err != nil {
-					log.Println(err.Error())
+					p.logger.Println(err.Error())
 					return
 				}
 
 				p.writeNext(next, ret)
-
-				wg.Done()
-				<-workers
 			}(num)
 		}
 
